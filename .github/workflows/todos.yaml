@@ -1,0 +1,24 @@
+name: Create issues from TODOs
+
+on:
+  push:
+    branches:
+      - main
+  # You can add the workflow_dispatch event to run it manually as well
+  workflow_dispatch:
+
+jobs:
+  todos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # Use a recent version of checkout
+      - name: TODO to Issue
+        # Use the official action from the Marketplace
+        uses: alstr/todo-to-issue-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Optional: Automatically close issues when the TODO is removed from code
+          CLOSE_ISSUES: "true"
+          # Optional: Add the issue URL back into the comment for traceability
+          INSERT_ISSUE_URLS: "true"
