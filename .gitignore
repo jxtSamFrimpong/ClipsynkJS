@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.development
+.env.test
+.env.production
+.env.local
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# NestJS specific
+pids
+*.pid
+
+# TypeORM
+ormconfig.json
+
+# Optional: Ignore local file uploads if any
+uploads/
+
+# Compodoc
+documentation/
+
+.env.docker-compose
