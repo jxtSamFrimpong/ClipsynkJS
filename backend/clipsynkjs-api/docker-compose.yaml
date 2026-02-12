@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    container_name: clipsynkjs-postgres
+    hostname: clipsynkjs-postgres
+    # environment:
+    #   # Interpolating values from .env.docker-compose
+    #   POSTGRES_USER: ${DB_USER}
+    #   POSTGRES_PASSWORD: ${DB_PASSWORD}
+    #   POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - .env.docker-compose 
+    ports:
+      - "35432:5432"
+    volumes:
+      # Use a named volume at the NEW recommended base path
+      - clipsynkjs-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+
+  cloudbeaver:
+    restart: unless-stopped
+    hostname: cloudbeaver
+    # Using Community Edition (dbeaver/cloudbeaver) by default. 
+    # Use dbeaver/cloudbeaver-ee for Enterprise Edition if you have a license.
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver
+    volumes:
+      - cloudbeaver:/opt/cloudbeaver/workspace
+    # environment:
+    #   - CLOUDBEAVER_DB_DRIVER=${CLOUDBEAVER_DB_DRIVER}
+    #   - CLOUDBEAVER_DB_URL=${CLOUDBEAVER_DB_URL}
+    #   - CLOUDBEAVER_DB_USER=${CLOUDBEAVER_DB_USER}
+    #   - CLOUDBEAVER_DB_PASSWORD=${CLOUDBEAVER_DB_PASSWORD}
+    #   - CLOUDBEAVER_DB_SCHEMA=${CLOUDBEAVER_DB_SCHEMA}
+    #   - CLOUDBEAVER_QM_DB_DRIVER=${CLOUDBEAVER_QM_DB_DRIVER}
+    #   - CLOUDBEAVER_QM_DB_URL=${CLOUDBEAVER_QM_DB_URL}
+    #   - CLOUDBEAVER_QM_DB_USER=${CLOUDBEAVER_QM_DB_USER}
+    #   - CLOUDBEAVER_QM_DB_PASSWORD=${CLOUDBEAVER_QM_DB_PASSWORD}
+    #   - CLOUDBEAVER_QM_DB_SCHEMA=${CLOUDBEAVER_QM_DB_SCHEMA}
+    env_file:
+      - .env.docker-compose 
+    ports:
+      - "8978:8978"
+    depends_on:
+      - db
+    # networks:
+    #   - cloudbeaver-private-net
+
+volumes:
+  postgres_data:
+  cloudbeaver:
+  clipsynkjs-pgdata:
+
+# networks:
+#   cloudbeaver-private-net:
