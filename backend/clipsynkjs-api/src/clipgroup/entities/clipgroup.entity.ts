@@ -1,6 +1,7 @@
+import { Exclude } from "class-transformer";
 import { Device } from "src/devices/entities/device.entity";
 import { User } from "src/users/entities/user/user";
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('clipgroup')
 export class Clipgroup {
@@ -13,13 +14,11 @@ export class Clipgroup {
     @Column()
     description: string;
 
-    //TODO: references user entities and should be a many to many relationship since a user can be in multiple groups and a group can have multiple users
-    @Column({ type: 'jsonb', default: [] })
-    @ManyToMany(() => User, user => user.id)
+    @ManyToMany(() => User, user => user.clipgroups)
+    @JoinTable()
     groupMembers: User[];
 
-    @Column({ type: 'uuid', default: null })
-    @ManyToOne(() => User, user => user.id, { cascade: true })
+    @ManyToOne(() => User, { cascade: true })
     owner: User;
 
     @Column({ default: true })
@@ -31,12 +30,17 @@ export class Clipgroup {
     @Column({ default: true })
     isDefaultGroup: boolean;
 
-    @Column({ type: 'jsonb', default: [] })
+    @ManyToMany(() => Device)
+    @JoinTable()
     devices: Device[];
 
+    @Exclude()
     @Column({ type: 'timestamp', nullable: true })
+    @CreateDateColumn()
     createdAt: Date;
 
+    @Exclude()
     @Column({ type: 'timestamp', nullable: true })
+    @UpdateDateColumn()
     updatedAt: Date;
 }

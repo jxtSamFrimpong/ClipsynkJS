@@ -1,16 +1,22 @@
-import { IsOptional } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateDeviceDto {
-    id: string;
+
+    @IsString()
+    @IsNotEmpty()
     name: string;
 
+    @IsString()
     @IsOptional()
     userId: string;
 
-    fingerpring: string;
+    @IsString()
+    @IsNotEmpty()
+    fingerprint: string;
 
     @IsOptional()
-    osType: string;
+    @IsBoolean()
+    isPrimary: boolean;
 
 
     @IsOptional()

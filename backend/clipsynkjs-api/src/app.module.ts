@@ -9,6 +9,7 @@ import { DevicesModule } from './devices/devices.module';
 import { appconfig } from './utils/config';
 import { LoggerOptions } from 'typeorm';
 import { ClipgroupModule } from './clipgroup/clipgroup.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ClipgroupModule } from './clipgroup/clipgroup.module';
      ClipboardModule,
      DevicesModule,
      ClipgroupModule,
+     AuthModule,
     ],
   // controllers: [AppController],
   // providers: [AppService],

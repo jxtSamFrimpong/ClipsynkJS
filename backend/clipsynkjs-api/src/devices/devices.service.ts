@@ -15,7 +15,12 @@ export class DevicesService {
   async create(createDeviceDto: CreateDeviceDto) {
     // return 'This action adds a new device';
     //TODO: user should be signed in
-    const device = await this.deviceRepository.create(createDeviceDto)
+    const { fingerprint, ...rest } = createDeviceDto
+    const device =  this.deviceRepository.create({
+      deviceFingerprint: fingerprint,
+      ...rest
+    })
+    //device.generateApiKey()
     return await this.deviceRepository.save(device)
   }
 

@@ -51,7 +51,7 @@ export class UsersService {
 
     async createUser(payload: CreateUserdto): Promise<User> {
         try {
-            const userObject = await this.userRepository.create(payload)
+            const userObject = this.userRepository.create(payload)
             const lastSeen = new Date()
             Object.assign(userObject, {lastSeen, passwordHash: payload.password})
             const user = await this.userRepository.save(userObject)
@@ -138,6 +138,7 @@ export class UsersService {
             return {
                 token: accessToken
             }
+            //TODO - should be login from one of user's devices
             //TODO - implement tokendto and use it as the return type for this function, we should also include the users id and email in the token so that we can use it for authentication and authorization in the future. We should also consider adding a refresh token mechanism to allow users to refresh their tokens without having to log in again. We should also consider adding a token blacklist mechanism to allow users to log out and invalidate their tokens. We should also consider adding a token expiration mechanism to automatically expire tokens after a certain period of time to improve security. We should also consider adding a token rotation mechanism to rotate tokens after a certain period of time to improve security.
             //TODO - we should also update the users last seen to now on login, but we should do that in a way that doesnt cause performance issues. We can either do it in a background job or we can do it in the same request but we should make sure that it doesnt cause performance issues. We can also consider only updating the last seen if the user has been inactive for a certain period of time (e.g., 1 hour) to reduce the number of updates to the database.
         }catch (error){

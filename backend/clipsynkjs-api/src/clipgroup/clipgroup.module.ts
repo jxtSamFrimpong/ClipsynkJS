@@ -8,5 +8,6 @@ import { Clipgroup } from './entities/clipgroup.entity';
   imports: [TypeOrmModule.forFeature([Clipgroup])],  // Add your entities here
   controllers: [ClipgroupController],
   providers: [ClipgroupService],
+  exports: [ClipgroupService],  // Export ClipgroupService to be used in other modules (e.g., AuthModule)
 })
 export class ClipgroupModule {}

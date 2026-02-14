@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcryptjs';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert, BeforeUpdate, ManyToMany } from 'typeorm';
 import { ClipboardEvent } from 'src/clipboard/entities/clipboard.entity';
-import { IsEmail, IsOptional } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional } from "class-validator";
 import { Exclude } from 'class-transformer';
 import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Device } from 'src/devices/entities/device.entity';
@@ -15,11 +15,11 @@ export class User {
   @Column({ length: 80 })
   name: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   @IsEmail()
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   @Exclude() // Excludes password when turning object to JSON
   passwordHash: string;
 
@@ -35,17 +35,14 @@ export class User {
 
   @IsOptional()
   @OneToMany(() => ClipboardEvent, (event) => event.sourceUserId, { cascade: true })
-  @Column({ type: 'jsonb', default: [] })
   clipboardEvents: ClipboardEvent[];
 
   @IsOptional()
   @OneToMany(() => Device, (device) => device.user, { cascade: true })
-  @Column({ type: 'jsonb', default: [] })
   devices: Device[];
 
 
   @ManyToMany(() => Clipgroup, clipgroup => clipgroup.groupMembers, { cascade: true })
-  @Column({ type: 'jsonb', default: [] })
   clipgroups: Clipgroup[];
 
 

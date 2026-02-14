@@ -7,9 +7,9 @@ import type { UUID } from 'crypto';
 import { CustomHttpExceptionFilter } from 'src/exception-filters/http-exception.filter';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 
-import { SkipAuth } from 'src/auth/skip.auth';
-import { Public } from 'src/auth/skip.auth';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { SkipAuth } from 'src/auth/guards/skip.auth';
+import { Public } from 'src/auth/guards/skip.auth';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 
 
 

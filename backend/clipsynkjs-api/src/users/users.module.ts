@@ -7,6 +7,7 @@ import { User } from './entities/user/user';
 @Module({
   imports: [TypeOrmModule.forFeature([User])],  // Makes the 'User' repository available
   controllers: [UsersController],
-  providers: [UsersService]
+  providers: [UsersService],
+  exports: [UsersService],  // Export UsersService to be used in other modules (e.g., AuthModule)
 })
 export class UsersModule {}
