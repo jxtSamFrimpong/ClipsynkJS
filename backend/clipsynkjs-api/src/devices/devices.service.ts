@@ -15,6 +15,7 @@ export class DevicesService {
   async create(createDeviceDto: CreateDeviceDto) {
     // return 'This action adds a new device';
     //TODO: user should be signed in
+    //TODO: Hash(MAC_Address + OS_User_ID) for devicefingerprint (on client side)
     const { fingerprint, ...rest } = createDeviceDto
     const device =  this.deviceRepository.create({
       deviceFingerprint: fingerprint,

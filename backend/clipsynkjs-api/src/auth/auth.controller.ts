@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupUserDto } from './dto/signup.dto'
 import { LoginUserDto } from './dto/login.dto'
+import { UpdatePasswordSubmitNewPassword, UpdatePassWordVerificationCodeDto} from './dto/update-pass.dto'
+import { PasswordResetAuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,18 +19,20 @@ export class AuthController {
     return await this.authService.login(loginDto);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.authService.findOne(+id);
-  // }
+  @Post('requestUpdatePassword')
+  async requestUpdatePassword(@Body('email') email: string) {
+    return await this.authService.requestUpdatePassword(email);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
+  @Post('verifyForgotPasswordCode')
+  async verifyForgotPasswordCode(@Body() updatePasswordVerificationCodeDto: UpdatePassWordVerificationCodeDto) {
+    return await this.authService.verifyForgotPasswordCode(updatePasswordVerificationCodeDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
+  @Post('updatePassword')
+  @UseGuards(PasswordResetAuthGuard)
+  async updatePassword(@Body() updatePasswordDto: UpdatePasswordSubmitNewPassword) {
+    return await this.authService.updatePassword(updatePasswordDto);
+  }
+
 }

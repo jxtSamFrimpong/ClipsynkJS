@@ -29,16 +29,29 @@ export class UsersService {
     }
 
     async getOne(id: string){
-        // const user = this.users.find(i => i.id.toLowerCase() === id.toLowerCase())
-        // if (!user){
-        //     throw new NotFoundException(`User ${id} doesnt exist`)
-        // }
-        // return user
+        
 
         try {
             const user = await this.userRepository.findOneBy({id})
             if (!user){
                 throw new NotFoundException(`User ${id} doesnt exist`)
+            }
+            return user
+        }
+        catch (error){
+            console.error('Error fetching user:', error);
+            throw error; // Rethrow the error to be handled by the controller
+        }
+    }
+
+
+    async getOneByMail(email: string){
+        
+
+        try {
+            const user = await this.userRepository.findOneBy({email})
+            if (!user){
+                throw new NotFoundException(`User ${email} doesnt exist`)
             }
             return user
         }
@@ -76,8 +89,10 @@ export class UsersService {
                 ...restOfPayload,
                 ...(passwordHash ? { passwordHash } : {}) // Only include passwordHash if it's provided in the payload
             }
-            const updatedUser = Object.assign(user, userToUpdateObject)
-            return await this.userRepository.save(updatedUser)
+            const updatedUserObj = Object.assign(user, userToUpdateObject)
+            const updatedUser  = await this.userRepository.save(updatedUserObj)
+            return updatedUser;
+            
         }
         catch (error){
             console.error('Error updating user:', error);
@@ -86,23 +101,7 @@ export class UsersService {
     }
 
     async deleteUser(id: string): Promise<{message: string, user: User}> {
-        // let UserToDelete;
-        // this.users = this.users.filter(i => {
-        //     if(i.id !== id){
-        //         return true
-        //     }
-        //     else {
-        //         UserToDelete = i
-        //         return false
-        //     }
-        // })
-        // if (!UserToDelete){
-        //     throw new NotFoundException(`User ${id} doesnt exist`)
-        // }
-        // return {
-        //     message: 'deleted',
-        //     user: UserToDelete
-        // }
+        
         try {
             const user = await this.userRepository.findOneBy({id})
             if (!user){

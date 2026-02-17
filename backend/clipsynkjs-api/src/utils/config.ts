@@ -21,6 +21,12 @@ interface AppConfig {
         jwtExpiration: string;
         jwtAlgorithm: string;
         jwtIssuer: string;
+        email: {
+            gmail: {
+                account: string;
+                password: string;
+            };
+        };
     };
 }
 
@@ -30,6 +36,11 @@ if (process.env.POSTGRES_TYPE   ) {
     ["mysql" , "postgres" , "cockroachdb" , "sap" , "mariadb" , "sqlite" , "cordova" , "react-native" , "nativescript" , "sqljs" , "oracle" , "mssql" , "mongodb" , "aurora-mysql" , "aurora-postgres" , "expo" , "better-sqlite3" , "capacitor" , "spanner"].includes(process.env.POSTGRES_TYPE) ? POSTGRES_TYPE = process.env.POSTGRES_TYPE : (() => { throw new Error(`Invalid POSTGRES_TYPE environment variable: ${process.env.POSTGRES_TYPE}. Must be one of mysql, postgres, cockroachdb, sap, mariadb, sqlite, cordova, react-native, nativescript, sqljs, oracle, mssql, mongodb, aurora-mysql, aurora-postgres, expo, better-sqlite3, capacitor, spanner.`) })();
 } 
 const ORM_LOGGING = process.env.DB_LOGGING === 'query' ? ['query', 'error'] : ['error'] 
+
+
+export const GMAIL_ACCOUNT = process.env.GMAIL_SMTP_ACCOUNT || '';
+export const GMAIL_PASSWORD = process.env.GMAIL_SMTP_PASSWORD || '';
+
 export const appconfig: AppConfig = {
     jwtSecret: process.env.JWT_SECRET || '',
     db: {
@@ -47,6 +58,13 @@ export const appconfig: AppConfig = {
         jwtExpiration: process.env.JWT_EXPIRATION || '1h',
         jwtAlgorithm: 'HS256',
         jwtIssuer: 'clipsynk-js',
-    
-    },
+        email: {
+            gmail: {
+            account: GMAIL_ACCOUNT,
+            password: GMAIL_PASSWORD
+            
+            }
+        
+        },
+    }
 };

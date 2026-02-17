@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisModule } from '@nestjs-modules/ioredis';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -25,6 +26,14 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true, 
       logging: appconfig.db.logging as LoggerOptions,
      // Set to false in production!
+    }),
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
+      options: {
+        db: 0,
+        password: ''
+      }
     }),
      ClipboardModule,
      DevicesModule,
