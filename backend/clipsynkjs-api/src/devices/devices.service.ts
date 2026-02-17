@@ -35,6 +35,11 @@ export class DevicesService {
     return await this.deviceRepository.findOneBy({ id });
   }
 
+  async findByFingerprint(deviceFingerprint: string) {
+    //TODO: we'd return the queried device only if it belongs to the user
+    return await this.deviceRepository.findOneBy({ deviceFingerprint });
+  }
+
   async update(id: string, updateDeviceDto: UpdateDeviceDto) {
     //TODO: only devices that belongs to this user can be updated
     const device = await this.deviceRepository.preload({

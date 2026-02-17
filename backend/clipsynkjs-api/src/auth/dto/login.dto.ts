@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, Matches, IsOptional } from "class-validator";
 
 export class LoginUserDto {
     @IsString()
@@ -14,4 +14,9 @@ export class LoginUserDto {
     @IsString()
     @IsNotEmpty()
     password: string;
+
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty()
+    deviceFingerprint: string;
 }

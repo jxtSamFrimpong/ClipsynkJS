@@ -9,6 +9,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { appconfig } from '../utils/config';
 import { PasswordResetAuthGuard } from './guards/auth.guard';
+import { DeviceAuthGuard } from './guards/auth.guards.devices';
+import { Device } from 'src/devices/entities/device.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 
 @Module({
   imports: [UsersModule, DevicesModule, ClipgroupModule, MailModule,
@@ -17,9 +21,10 @@ import { PasswordResetAuthGuard } from './guards/auth.guard';
       secret: appconfig.auth.jwtSecret, //TODO
       signOptions: { expiresIn: '15m' }, //TODO
     }),
+    TypeOrmModule.forFeature([Device]),
   ],  // Add any necessary modules here (e.g., UsersModule, DevicesModule)
   controllers: [AuthController],
-  providers: [AuthService, PasswordResetAuthGuard],
+  providers: [AuthService, PasswordResetAuthGuard, DeviceAuthGuard],
   exports: [AuthService, JwtModule]
 })
 export class AuthModule {}

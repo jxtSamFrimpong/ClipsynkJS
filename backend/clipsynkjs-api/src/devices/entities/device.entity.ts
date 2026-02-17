@@ -1,7 +1,7 @@
 import { Entity } from "typeorm";
 import { Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index, BeforeInsert } from 'typeorm';
 import { User } from "../../users/entities/user/user";
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import * as crypto from 'crypto';
 import { IsOptional, IsString } from "class-validator";
 
@@ -32,6 +32,8 @@ export class Device {
   name: string; // e.g., "MacBook Pro", "Windows Desktop"
 
 
+  @Exclude()
+  @Expose({ groups: ['device:create'] })
   @Column({ unique: true })
   apiKey: string; // Used by daemon for API requests
 

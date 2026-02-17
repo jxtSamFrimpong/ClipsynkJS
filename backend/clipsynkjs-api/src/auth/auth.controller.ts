@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, SerializeOptions } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupUserDto } from './dto/signup.dto'
 import { LoginUserDto } from './dto/login.dto'
@@ -10,11 +10,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @SerializeOptions({ groups: ['device:create'] })
   async signup(@Body() signupDto: SignupUserDto) {
     return await this.authService.signup(signupDto);
   }
 
   @Post('login')
+  @SerializeOptions({ groups: ['device:create'] })
   async login(@Body() loginDto: LoginUserDto) {
     return await this.authService.login(loginDto);
   }

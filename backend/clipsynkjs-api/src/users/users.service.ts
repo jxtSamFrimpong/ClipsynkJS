@@ -7,7 +7,9 @@ import { UpdateUserdto } from './dto/updateUser.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user/user';
+import { Device } from 'src/devices/entities/device.entity';
 import { appconfig } from '../utils/config';
+import { DevicesService } from 'src/devices/devices.service';
 
 
 
@@ -15,7 +17,8 @@ import { appconfig } from '../utils/config';
 export class UsersService {
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepository: Repository<User>,
+        private readonly deviceService: DevicesService,
     ){}  
 
     async getAll(): Promise<Partial<User>[]> {
@@ -118,7 +121,7 @@ export class UsersService {
         }
     }
 
-    async loginUser(email: string, password: string): Promise<{ token: string }> {
+    async loginUser(email: string, password: string, fingerprint?: string | null): Promise<{ token: string }> {
         try {
             const user = await this.userRepository.findOneBy({email})
             if (!user){
@@ -127,6 +130,23 @@ export class UsersService {
             if (!(await user.validatePassword(password))){
                 throw new UnauthorizedException('Invalid credentials');
             }
+            //if its a new device, add it as an inactive device
+            if (fingerprint){
+                const device = user.devices.find(device => device.deviceFingerprint === fingerprint)
+                if (!device){
+                    //add new inactive device
+                    const newDevice = await this.deviceService.create({
+                        fingerprint: fingerprint,
+                        name: `${user.name} ${fingerprint}`,
+                        userId: user.id,
+                        isActive: false,
+                        isPrimary: false,
+                        platformInfo: {}  
+                    })
+                    //TODO: add checks to confirm device creation was successful
+                }
+
+                }
             const payload = { id: user.id, email: user.email };
             // const accessToken = this.jwtService.sign(payload);
             const secretKey = appconfig.auth.jwtSecret; //TODO: move to a central config file and make sure to use a strong secret key in production, we should also consider using a different secret key for different environments (e.g., development, staging, production) to improve security

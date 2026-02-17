@@ -63,7 +63,8 @@ export class AuthService {
             os,
             osVersion,
             ...platformInfo
-          }
+          },
+          isActive: true
         })
         if (!device){
           throw new Error('Error creating device')
@@ -115,7 +116,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginUserDto) {
-    return await this.userService.loginUser(loginDto.email, loginDto.password)
+    return await this.userService.loginUser(loginDto.email, loginDto.password, loginDto.deviceFingerprint)
   }
 
 

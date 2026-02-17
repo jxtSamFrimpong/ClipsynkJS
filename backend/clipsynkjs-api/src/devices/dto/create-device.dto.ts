@@ -22,5 +22,9 @@ export class CreateDeviceDto {
     @IsOptional()
     platformInfo: Record<string, any>;
 
+    @IsOptional()
+    @IsBoolean()
+    isActive: boolean;
+
 
 }
