@@ -1,25 +1,22 @@
+import { useDashboard } from "~/context/DashboardContext";
 import type { NavItem } from "~/types/nav_items";
 
 // ─────────────────────────────────────────────
 //  NAV ITEM
 // ─────────────────────────────────────────────
-export default function DashboardNavItems({
-    item,
-    active,
-    onClick,
-    collapsed,
-}: {
-    item: NavItem;
-    active: string;
-    onClick: (id: string) => void;
-    collapsed: boolean;
-}) {
+export default function DashboardNavItems({ item }: { item: NavItem }) {
+    const { active, setActive, collapsed } = useDashboard();
     const isActive = active === item.id;
+
+    function handleClick() {
+        console.log("[DashboardNavItems] nav item clicked:", item.id, "| previous active:", active, "| isActive:", isActive);
+        setActive(item.id);
+    }
 
     return (
         <button
-            onClick={() => onClick(item.id)}
-            title={collapsed ? item.label : undefined}
+            onClick={handleClick}
+            title={item.label}
             className={`
         w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-mono
         transition-colors duration-150
@@ -30,11 +27,12 @@ export default function DashboardNavItems({
         ${collapsed ? "justify-center" : ""}
       `}
         >
-            <span
-                className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${isActive ? "bg-green-400" : "bg-neutral-700"
-                    }`}
-            />
-            {!collapsed && <span>{item.label}</span>}
+            <span className="font-mono text-base shrink-0">
+                <span className="text-neutral-600">[</span>
+                <span className={isActive ? "text-green-400" : "text-neutral-500"}>{item.icon}</span>
+                <span className="text-neutral-600">]</span>
+            </span>
+            {!collapsed && <span className="text-sm">{item.label}</span>}
         </button>
     );
 }
