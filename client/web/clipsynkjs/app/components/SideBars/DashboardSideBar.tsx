@@ -30,7 +30,7 @@ function Sidebar() {
                 <Logo />
                 <button
                     onClick={handleToggle}
-                    className={`mr-3 shrink-0 p-1.5 rounded-md flex items-center justify-center text-yellow-400 hover:bg-[#1a1a1a] hover:text-yellow-300 transition-colors ${collapsed ? "hidden" : ""}`}
+                    className={`cursor-pointer mr-3 shrink-0 p-1.5 rounded-md flex items-center justify-center text-yellow-400 hover:bg-[#1a1a1a] hover:text-yellow-300 transition-colors ${collapsed ? "hidden" : ""}`}
                 >
                     <svg
                         className={`w-3.5 h-3.5 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}

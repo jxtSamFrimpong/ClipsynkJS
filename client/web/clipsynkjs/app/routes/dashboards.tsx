@@ -1,5 +1,10 @@
 import type { Route } from "./+types/dashboards";
 import DashboardsPage from "~/pages/dashboards/dashboardsPage";
+import { requireAuth } from '~/loaders/auth';
+
+export async function loader({ request }: Route.LoaderArgs) {
+    return requireAuth(request);
+}
 
 
 export function meta({ }: Route.MetaArgs) {
