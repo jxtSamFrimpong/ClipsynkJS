@@ -1,11 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateClipgroupDto } from './dto/create-clipgroup.dto';
 import { UpdateClipgroupDto } from './dto/update-clipgroup.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Clipgroup } from './entities/clipgroup.entity';
+import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class ClipgroupService {
-  create(createClipgroupDto: CreateClipgroupDto) {
-    return 'This action adds a new clipgroup';
+  constructor(
+    @InjectRepository(Clipgroup)
+    private clipgroupRepository: Repository<Clipgroup>
+  ){}
+  async create(createClipgroupDto: CreateClipgroupDto) {
+    const newClipgroup = this.clipgroupRepository.create(createClipgroupDto)
+    return await this.clipgroupRepository.save(newClipgroup);
   }
 
   findAll() {

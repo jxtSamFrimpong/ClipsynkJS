@@ -24,39 +24,66 @@ services:
       start_period: 10s
 
 
-  cloudbeaver:
+  # cloudbeaver:
+  #   restart: unless-stopped
+  #   hostname: cloudbeaver
+  #   # Using Community Edition (dbeaver/cloudbeaver) by default. 
+  #   # Use dbeaver/cloudbeaver-ee for Enterprise Edition if you have a license.
+  #   image: dbeaver/cloudbeaver:latest
+  #   container_name: cloudbeaver
+  #   volumes:
+  #     - cloudbeaver:/opt/cloudbeaver/workspace
+  #   # environment:
+  #   #   - CLOUDBEAVER_DB_DRIVER=${CLOUDBEAVER_DB_DRIVER}
+  #   #   - CLOUDBEAVER_DB_URL=${CLOUDBEAVER_DB_URL}
+  #   #   - CLOUDBEAVER_DB_USER=${CLOUDBEAVER_DB_USER}
+  #   #   - CLOUDBEAVER_DB_PASSWORD=${CLOUDBEAVER_DB_PASSWORD}
+  #   #   - CLOUDBEAVER_DB_SCHEMA=${CLOUDBEAVER_DB_SCHEMA}
+  #   #   - CLOUDBEAVER_QM_DB_DRIVER=${CLOUDBEAVER_QM_DB_DRIVER}
+  #   #   - CLOUDBEAVER_QM_DB_URL=${CLOUDBEAVER_QM_DB_URL}
+  #   #   - CLOUDBEAVER_QM_DB_USER=${CLOUDBEAVER_QM_DB_USER}
+  #   #   - CLOUDBEAVER_QM_DB_PASSWORD=${CLOUDBEAVER_QM_DB_PASSWORD}
+  #   #   - CLOUDBEAVER_QM_DB_SCHEMA=${CLOUDBEAVER_QM_DB_SCHEMA}
+  #   env_file:
+  #     - .env.docker-compose 
+  #   ports:
+  #     - "8978:8978"
+  #   depends_on:
+  #     - db
+  #   # networks:
+  #   #   - cloudbeaver-private-net
+
+  redis:
+    image: redis:alpine
+    container_name: clipsynkjs-redis
     restart: unless-stopped
-    hostname: cloudbeaver
-    # Using Community Edition (dbeaver/cloudbeaver) by default. 
-    # Use dbeaver/cloudbeaver-ee for Enterprise Edition if you have a license.
-    image: dbeaver/cloudbeaver:latest
-    container_name: cloudbeaver
-    volumes:
-      - cloudbeaver:/opt/cloudbeaver/workspace
-    # environment:
-    #   - CLOUDBEAVER_DB_DRIVER=${CLOUDBEAVER_DB_DRIVER}
-    #   - CLOUDBEAVER_DB_URL=${CLOUDBEAVER_DB_URL}
-    #   - CLOUDBEAVER_DB_USER=${CLOUDBEAVER_DB_USER}
-    #   - CLOUDBEAVER_DB_PASSWORD=${CLOUDBEAVER_DB_PASSWORD}
-    #   - CLOUDBEAVER_DB_SCHEMA=${CLOUDBEAVER_DB_SCHEMA}
-    #   - CLOUDBEAVER_QM_DB_DRIVER=${CLOUDBEAVER_QM_DB_DRIVER}
-    #   - CLOUDBEAVER_QM_DB_URL=${CLOUDBEAVER_QM_DB_URL}
-    #   - CLOUDBEAVER_QM_DB_USER=${CLOUDBEAVER_QM_DB_USER}
-    #   - CLOUDBEAVER_QM_DB_PASSWORD=${CLOUDBEAVER_QM_DB_PASSWORD}
-    #   - CLOUDBEAVER_QM_DB_SCHEMA=${CLOUDBEAVER_QM_DB_SCHEMA}
-    env_file:
-      - .env.docker-compose 
     ports:
-      - "8978:8978"
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: clipsynkjs-redis-insight
+    restart: unless-stopped
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight:/data
     depends_on:
-      - db
-    # networks:
-    #   - cloudbeaver-private-net
+      - redis
 
 volumes:
   postgres_data:
   cloudbeaver:
   clipsynkjs-pgdata:
+  redis_data:
+  redisinsight:
 
 # networks:
 #   cloudbeaver-private-net:

@@ -15,7 +15,13 @@ export class DevicesService {
   async create(createDeviceDto: CreateDeviceDto) {
     // return 'This action adds a new device';
     //TODO: user should be signed in
-    const device = await this.deviceRepository.create(createDeviceDto)
+    //TODO: Hash(MAC_Address + OS_User_ID) for devicefingerprint (on client side)
+    const { fingerprint, ...rest } = createDeviceDto
+    const device =  this.deviceRepository.create({
+      deviceFingerprint: fingerprint,
+      ...rest
+    })
+    //device.generateApiKey()
     return await this.deviceRepository.save(device)
   }
 
@@ -27,6 +33,11 @@ export class DevicesService {
   async findOne(id: string) {
     //TODO: we'd return the queried device only if it belongs to the user
     return await this.deviceRepository.findOneBy({ id });
+  }
+
+  async findByFingerprint(deviceFingerprint: string) {
+    //TODO: we'd return the queried device only if it belongs to the user
+    return await this.deviceRepository.findOneBy({ deviceFingerprint });
   }
 
   async update(id: string, updateDeviceDto: UpdateDeviceDto) {

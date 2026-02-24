@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisModule } from '@nestjs-modules/ioredis';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -9,6 +10,7 @@ import { DevicesModule } from './devices/devices.module';
 import { appconfig } from './utils/config';
 import { LoggerOptions } from 'typeorm';
 import { ClipgroupModule } from './clipgroup/clipgroup.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,9 +27,18 @@ import { ClipgroupModule } from './clipgroup/clipgroup.module';
       logging: appconfig.db.logging as LoggerOptions,
      // Set to false in production!
     }),
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
+      options: {
+        db: 0,
+        password: ''
+      }
+    }),
      ClipboardModule,
      DevicesModule,
      ClipgroupModule,
+     AuthModule,
     ],
   // controllers: [AppController],
   // providers: [AppService],

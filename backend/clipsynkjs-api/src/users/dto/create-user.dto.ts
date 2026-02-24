@@ -1,11 +1,7 @@
 import { IsInt, IsNotEmpty, IsString, IsUUID, IsEmail, Length } from "class-validator";
 
-import type { UUID } from "crypto";
-
 
 export class CreateUserdto {
-    // @IsUUID()
-    // id: UUID
 
     @IsString()
     @IsNotEmpty()
@@ -18,6 +14,7 @@ export class CreateUserdto {
     password: string
 
     @IsEmail()
+    @IsNotEmpty()
     email: string
 
 }

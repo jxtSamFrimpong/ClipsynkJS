@@ -1,9 +1,14 @@
 import { Entity } from "typeorm";
-import { Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index, BeforeInsert } from 'typeorm';
 import { User } from "../../users/entities/user/user";
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import * as crypto from 'crypto';
-import { IsOptional } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
+
+export enum ipType {
+    IPv4 = 'IPv4',
+    IPv6 = 'IPv6'
+}
 
 @Entity('devices')
 @Index(['isActive'])
@@ -12,13 +17,12 @@ export class Device {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @IsOptional()
-  @Column({ type: 'uuid', default: null})
-  userId: string;
+  // @IsOptional()
+  // @Column({ type: 'uuid', default: null})
+  // userId: string;
 
   @IsOptional()
   @ManyToOne(() => User, user => user.devices, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ unique: true })
@@ -27,14 +31,13 @@ export class Device {
   @Column()
   name: string; // e.g., "MacBook Pro", "Windows Desktop"
 
-  @Column()
-  osType: string; // darwin, linux, win32
 
-  @Column({ unique: true })
   @Exclude()
+  @Expose({ groups: ['device:create'] })
+  @Column({ unique: true })
   apiKey: string; // Used by daemon for API requests
 
-  //should be a json column with metadata about the platform
+  //should be a json column with metadata about the platform(client)
   @IsOptional()
   @Column({ type: 'jsonb', nullable: true })
   platformInfo: Record<string, any>;
@@ -51,8 +54,11 @@ export class Device {
   @Column({ default: false })
   isPrimary: boolean;
 
-  static generateApiKey(): string {
-    return `clipsynk_${crypto.randomBytes(32).toString('hex')}`;
+  @BeforeInsert()
+  generateApiKey() {
+    if (!this.apiKey) {
+      this.apiKey = `clipsynk_${crypto.randomBytes(32).toString('hex')}`;
+    }
   }
 
   updateLastSeen() {
