@@ -181,6 +181,9 @@ Slicing the string directly (e.g. `.slice(0, length - 2)`) gives `0` for 2-char 
 `.env` must have `API_BASE_URL=http://localhost:3000` — loaders and actions throw at startup without it.
 Copy from `.env.example` which is committed to the repo.
 
+## Git preferences
+- Do NOT include `Co-Authored-By` or any author/AI references in commit messages
+
 ## Logging standard (fullstackopen)
 Every meaningful state change, user interaction, and mount uses `console.log`.
 Format: `[ComponentName] description: value`

@@ -28,14 +28,16 @@ interface AppConfig {
             };
         };
     };
+    env: string;
+    clientUrl: string[];
 }
 
 let POSTGRES_TYPE;
-if (process.env.POSTGRES_TYPE   ) {
+if (process.env.POSTGRES_TYPE) {
     //TODO the process.env.POSTGRES_TYPE is a type of DatabaseType
-    ["mysql" , "postgres" , "cockroachdb" , "sap" , "mariadb" , "sqlite" , "cordova" , "react-native" , "nativescript" , "sqljs" , "oracle" , "mssql" , "mongodb" , "aurora-mysql" , "aurora-postgres" , "expo" , "better-sqlite3" , "capacitor" , "spanner"].includes(process.env.POSTGRES_TYPE) ? POSTGRES_TYPE = process.env.POSTGRES_TYPE : (() => { throw new Error(`Invalid POSTGRES_TYPE environment variable: ${process.env.POSTGRES_TYPE}. Must be one of mysql, postgres, cockroachdb, sap, mariadb, sqlite, cordova, react-native, nativescript, sqljs, oracle, mssql, mongodb, aurora-mysql, aurora-postgres, expo, better-sqlite3, capacitor, spanner.`) })();
-} 
-const ORM_LOGGING = process.env.DB_LOGGING === 'query' ? ['query', 'error'] : ['error'] 
+    ["mysql", "postgres", "cockroachdb", "sap", "mariadb", "sqlite", "cordova", "react-native", "nativescript", "sqljs", "oracle", "mssql", "mongodb", "aurora-mysql", "aurora-postgres", "expo", "better-sqlite3", "capacitor", "spanner"].includes(process.env.POSTGRES_TYPE) ? POSTGRES_TYPE = process.env.POSTGRES_TYPE : (() => { throw new Error(`Invalid POSTGRES_TYPE environment variable: ${process.env.POSTGRES_TYPE}. Must be one of mysql, postgres, cockroachdb, sap, mariadb, sqlite, cordova, react-native, nativescript, sqljs, oracle, mssql, mongodb, aurora-mysql, aurora-postgres, expo, better-sqlite3, capacitor, spanner.`) })();
+}
+const ORM_LOGGING = process.env.DB_LOGGING === 'query' ? ['query', 'error'] : ['error']
 
 
 export const GMAIL_ACCOUNT = process.env.GMAIL_SMTP_ACCOUNT || '';
@@ -51,7 +53,7 @@ export const appconfig: AppConfig = {
         database: process.env.POSTGRES_DB || '',
         dbtype: POSTGRES_TYPE,
         logging: ORM_LOGGING
-    
+
     },
     auth: {
         jwtSecret: process.env.JWT_SECRET || '',
@@ -60,11 +62,13 @@ export const appconfig: AppConfig = {
         jwtIssuer: 'clipsynk-js',
         email: {
             gmail: {
-            account: GMAIL_ACCOUNT,
-            password: GMAIL_PASSWORD
-            
+                account: GMAIL_ACCOUNT,
+                password: GMAIL_PASSWORD
+
             }
-        
+
         },
-    }
+    },
+    env: process.env.ENV || "dev",
+    clientUrl: process.env.CLIENT_URL?.trim().split(",") || ["http://localhost:5173"],
 };

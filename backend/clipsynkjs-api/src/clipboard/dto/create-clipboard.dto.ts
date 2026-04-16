@@ -1,18 +1,18 @@
-import { IsDate, IsEnum, IsOptional} from 'class-validator'
+import { IsDate, IsEnum, IsOptional, IsDateString } from 'class-validator'
 import { StorageStrategy } from '../entities/clipboard.entity';
 
 
 export class CreateClipboardDto {
-    
-    @IsDate()
+
+    @IsDateString()
     generatedAt: string;
 
     deviceFingerprint: string;
-    
+
     clientTimestamp: number;
 
     mimeType: string;
-    
+
     @IsOptional()
     content: string;
 

@@ -50,3 +50,5 @@ uploads/
 documentation/
 
 .env.docker-compose
+welcome
+cookies.txt

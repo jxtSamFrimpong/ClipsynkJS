@@ -5,18 +5,20 @@ import { UpdateClipboardDto } from './dto/update-clipboard.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClipboardEvent, getStorageStrategy } from './entities/clipboard.entity';
+import { take } from 'rxjs';
+import { skip } from 'node:test';
 
 @Injectable()
 export class ClipboardService {
-    constructor(
-        @InjectRepository(ClipboardEvent)
-        private clipboardEventRepository: Repository<ClipboardEvent>
-    ){}
+  constructor(
+    @InjectRepository(ClipboardEvent)
+    private clipboardEventRepository: Repository<ClipboardEvent>
+  ) { }
 
   async create(createClipboardDto: CreateClipboardDto): Promise<ClipboardEvent> {
     try {
-        const storageStrategy = getStorageStrategy(
-        createClipboardDto.mimeType, 
+      const storageStrategy = getStorageStrategy(
+        createClipboardDto.mimeType,
         createClipboardDto.mimeType.includes('text/plain') ? Buffer.byteLength(createClipboardDto.content, 'utf-8') : createClipboardDto.content.length
       );
 
@@ -24,15 +26,21 @@ export class ClipboardService {
       Object.assign(event, createClipboardDto, { storageStrategy: storageStrategy })
       return await this.clipboardEventRepository.save(event);
     }
-    catch (error){
-        console.error('Error creating clipboard event:', error);
-        throw error; // Rethrow the error to be handled by the controller
+    catch (error) {
+      console.error('Error creating clipboard event:', error);
+      throw error; // Rethrow the error to be handled by the controller
     }
   }
 
-  async findAll(): Promise<ClipboardEvent[]> {
+  async findAll({ page, limit }: { page: number, limit: number }): Promise<[ClipboardEvent[], number]> {
     try {
-      return await this.clipboardEventRepository.find();
+      return await this.clipboardEventRepository.findAndCount({
+        take: limit,
+        skip: (page - 1),
+        order: {
+          createdAt: 'DESC'
+        }
+      });
     } catch (error) {
       console.error('Error finding all clipboard events:', error);
       throw error;
