@@ -1,12 +1,13 @@
 import PageHeader from "./PageHeader";
+import PasteZone from "./PasteZone";
 import FilterBar from "./FilterBar/FilterBar";
 import ClipsList from "./ClipsList/ClipsList";
 import StatsSection from "./StatsSection/StatsSection";
 
 // ─────────────────────────────────────────────
 //  CLIPS AREA
-//  Left column of the dashboard: header, filter
-//  bar, clip list, and stat cards stacked.
+//  Left column of the dashboard: header, paste
+//  zone, filter bar, clip list, and stat cards.
 // ─────────────────────────────────────────────
 export default function ClipsArea() {
     return (
@@ -15,6 +16,7 @@ export default function ClipsArea() {
             style={{ padding: "32px" }}
         >
             <PageHeader />
+            <PasteZone />
             <FilterBar />
             <ClipsList />
             <StatsSection />

@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ClipgroupService } from './clipgroup.service';
 import { CreateClipgroupDto } from './dto/create-clipgroup.dto';
 import { UpdateClipgroupDto } from './dto/update-clipgroup.dto';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard.jwt';
 
+UseGuards(JwtAuthGuard)
 @Controller('clipgroup')
 export class ClipgroupController {
-  constructor(private readonly clipgroupService: ClipgroupService) {}
+  constructor(private readonly clipgroupService: ClipgroupService) { }
 
   @Post()
   create(@Body() createClipgroupDto: CreateClipgroupDto) {

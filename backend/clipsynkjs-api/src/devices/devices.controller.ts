@@ -3,11 +3,13 @@ import { DevicesService } from './devices.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import { DeviceAuthGuard } from 'src/auth/guards/auth.guards.devices';
+import { JwtAuthGuard } from 'src/auth/guards/auth.guard.jwt';
 
-@UseGuards(DeviceAuthGuard)
+// @UseGuards(DeviceAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('devices')
 export class DevicesController {
-  constructor(private readonly devicesService: DevicesService) {}
+  constructor(private readonly devicesService: DevicesService) { }
 
   @Post()
   async create(@Body() createDeviceDto: CreateDeviceDto) {

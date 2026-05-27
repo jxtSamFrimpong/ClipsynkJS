@@ -9,10 +9,10 @@ import { MailService } from 'src/utils/mail.service';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import * as crypto from 'crypto';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { appconfig } from '../utils/config';
 
-import { UpdatePasswordSubmitNewPassword, UpdatePassWordVerificationCodeDto} from './dto/update-pass.dto'
+import { UpdatePasswordSubmitNewPassword, UpdatePassWordVerificationCodeDto } from './dto/update-pass.dto'
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     private readonly clipgroupService: ClipgroupService,
     private mailService: MailService,
     @InjectRedis() private readonly redisService: Redis
-  ){
+  ) {
 
   }
 
@@ -38,20 +38,20 @@ export class AuthService {
     try {
       //create user
       try {
-        const {name: username, email, password } = signupDto
-        user = await this .userService.createUser({ email, password, name: username,})
-        if (!user){
+        const { name: username, email, password } = signupDto
+        user = await this.userService.createUser({ email, password, name: username, })
+        if (!user) {
           throw new Error('Error creating user')
         }
       }
-      catch(err){
+      catch (err) {
         console.error('Error creating user:', err);
-        throw err; 
+        throw err;
       }
 
       //create defalt user device
       try {
-        const { fingerprint, macAddress, ip, os, osVersion, platformInfo, name: deviceName} = signupDto.device
+        const { fingerprint, macAddress, ip, os, osVersion, platformInfo, name: deviceName } = signupDto.device
         device = await this.deviceService.create({
           fingerprint: fingerprint,
           userId: user.id,
@@ -66,52 +66,60 @@ export class AuthService {
           },
           isActive: true
         })
-        if (!device){
+        if (!device) {
           throw new Error('Error creating device')
         }
       }
-      catch(err){
+      catch (err) {
         console.error('Error creating device:', err);
         //rollback user creation if device creation fails
         await this.userService.deleteUser(user.id)
-        throw err; 
+        throw err;
       }
 
 
       //create default clipgroup for user
       try {
-            defaultClipgroup = await this.clipgroupService.create({
-              name: `${user.id} Default Clipgroup`,
-              description: `Default clipgroup for ${user.name}`,
-              owner: { id: user.id},
-              devices: [{ id:device.id}],
-              isDefaultGroup: true,
-              isActive: true,
-              isPublic: false,
-              groupMembers: [{ id: user.id}]     
-            })
-          if (!defaultClipgroup){
-            throw new Error('Error creating default clipgroup')
-          }
-      
-
-        return {
-          user,
-          device,
-          defaultClipgroup
+        defaultClipgroup = await this.clipgroupService.create({
+          name: `${user.id} Default Clipgroup`,
+          description: `Default clipgroup for ${user.name}`,
+          owner: { id: user.id },
+          devices: [{ id: device.id }],
+          isDefaultGroup: true,
+          isActive: true,
+          isPublic: false,
+          groupMembers: [{ id: user.id }]
+        })
+        if (!defaultClipgroup) {
+          throw new Error('Error creating default clipgroup')
         }
       }
-      catch(err){
+      catch (err) {
         console.error('Error creating default clipgroup:', err);
         //rollback user and device creation if clipgroup creation fails
         await this.deviceService.remove(device.id)
         await this.userService.deleteUser(user.id)
-        throw err; 
+        throw err;
+      }
+
+      const secretKey = appconfig.auth.jwtSecret
+      if (!secretKey) {
+        throw new Error('JWT_SECRET environment variable is not set');
+      }
+      const payload = {
+        ...user,
+        device,
+        defaultClipgroup
+      }
+      const accessToken = jwt.sign(payload, secretKey, { expiresIn: appconfig.auth.jwtExpiration, algorithm: appconfig.auth.jwtAlgorithm, issuer: appconfig.auth.jwtIssuer } as SignOptions)
+
+      return {
+        token: accessToken
       }
     }
-    catch (error){
+    catch (error) {
       console.error('Error during signup:', error);
-      throw error; 
+      throw error;
     }
   }
 
@@ -120,13 +128,13 @@ export class AuthService {
   }
 
 
-  async requestUpdatePassword(email: string){
+  async requestUpdatePassword(email: string) {
     try {
-        if (!email){
+      if (!email) {
         throw new Error('Email is required')
       }
       const user = await this.userService.getOneByMail(email)
-      if (!user){
+      if (!user) {
         throw new Error('User not found')
       }
 
@@ -139,61 +147,65 @@ export class AuthService {
 
       // 3. Send via Nodemailer (your existing logic)
       await this.mailService.sendUserConfirmation(email, user.name, otp);
-      
+
       return { message: 'OTP sent successfully', user: user.id };
     }
-    catch(err){
+    catch (err) {
       console.error('Error during requestUpdatePassword:', err);
-      throw err; 
+      throw err;
     }
   }
 
-  async verifyForgotPasswordCode(updatePasswordVerificationCodeDto: UpdatePassWordVerificationCodeDto){
+  async verifyForgotPasswordCode(updatePasswordVerificationCodeDto: UpdatePassWordVerificationCodeDto) {
     try {
       const user = await this.userService.getOne(updatePasswordVerificationCodeDto.id)
-      if (!user){
+      if (!user) {
         throw new Error('User not found')
       }
 
       //code must exist and still ve valid on redis
       const otp = await this.redisService.get(`otp:${user.email}`);
-      if (!otp){
+      if (!otp) {
         throw new Error('OTP not found')
       }
-      if (otp !== updatePasswordVerificationCodeDto.updatePasswordCode){
+      if (otp !== updatePasswordVerificationCodeDto.updatePasswordCode) {
         throw new Error('OTP does not match')
       }
 
 
-      const payload = { 
-        user: user.id, 
+      const payload = {
+        user: user.id,
         scope: 'password_reset',
         // Using a slice of the hash keeps the token invalid once the password changes
-        version: user.passwordHash.slice(-10) 
+        version: user.passwordHash.slice(-10)
       };
 
       const secretKey = appconfig.auth.jwtSecret;
       const accessToken = jwt.sign(payload, secretKey, { expiresIn: '15m', algorithm: 'HS256', issuer: 'clipsynk-js' }); //TODO: use appconfig for the token options and make sure to set appropriate expiration time, algorithm, and issuer for the tokens to improve security
       return {
-          token: accessToken
+        token: accessToken
       }
     }
-    catch (err){
+    catch (err) {
       console.error('Error during verifyForgotPasswordCode:', err);
-      throw err; 
+      throw err;
     }
 
-    
+
   }
 
-  async updatePassword(updatePasswordDto: UpdatePasswordSubmitNewPassword){
+  async getMe(user: { id: string; email: string }) {
+    return await this.userService.getOne(user.id);
+  }
+
+  async updatePassword(updatePasswordDto: UpdatePasswordSubmitNewPassword) {
     try {
       //user.hashPassword(updatePasswordDto.password) 
-      console.log('about to update password',  updatePasswordDto)
-      return await this.userService.updateUser(updatePasswordDto.id, { password: updatePasswordDto.password})
+      console.log('about to update password', updatePasswordDto)
+      return await this.userService.updateUser(updatePasswordDto.id, { password: updatePasswordDto.password })
 
     }
-    catch(err){
+    catch (err) {
       console.error('Error during updatePassword:', err)
       throw err;
     }
