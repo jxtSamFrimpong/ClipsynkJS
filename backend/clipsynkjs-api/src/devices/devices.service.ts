@@ -11,13 +11,13 @@ export class DevicesService {
   constructor(
     @InjectRepository(Device)
     private deviceRepository: Repository<Device>
-  ) {}
+  ) { }
   async create(createDeviceDto: CreateDeviceDto) {
     // return 'This action adds a new device';
     //TODO: user should be signed in
     //TODO: Hash(MAC_Address + OS_User_ID) for devicefingerprint (on client side)
     const { fingerprint, ...rest } = createDeviceDto
-    const device =  this.deviceRepository.create({
+    const device = this.deviceRepository.create({
       deviceFingerprint: fingerprint,
       ...rest
     })
@@ -72,7 +72,7 @@ export class DevicesService {
     return await this.deviceRepository.save(device);
   }
 
-  async reactivate(id: string){
+  async reactivate(id: string) {
     //TODO: device to be reactivated should belong to this user
     //TODO: device can be reactivated with active devices belonging to the User
     const device = await this.deviceRepository.findOneBy({ id });

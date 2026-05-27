@@ -96,3 +96,36 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+```
+1. Override the strategy name — auth.passport.stategy.ts:8                                                                                                                                  
+                                                                                                                                                                                              
+  PassportStrategy() accepts an optional second argument to override the default name:                                                                                                        
+                                                                                                                                                                                              
+  // Before                                                                                                                                                                                   
+  export class JwtStrategy extends PassportStrategy(Strategy) { ... }
+
+  // After
+  export class JwtStrategy extends PassportStrategy(Strategy, 'my-strategy') { ... }
+
+  Without the second argument, it falls back to the name hardcoded in passport-jwt's Strategy, which is 'jwt'.
+
+  ---
+  2. Match it in the guard — auth.guard.jwt.ts:5
+
+  // Before
+  export class JwtAuthGuard extends AuthGuard('jwt') {}
+
+  // After
+  export class JwtAuthGuard extends AuthGuard('my-strategy') {}
+
+  ---
+  Optionally — auth.module.ts:18
+
+  If you also want the default strategy name to match (used when AuthGuard() is called with no argument):
+
+  PassportModule.register({ defaultStrategy: 'my-strategy' })
+
+  This one is only relevant if you ever use @UseGuards(AuthGuard()) without a string argument anywhere. Currently you always pass 'jwt' explicitly, so this is optional.
+```

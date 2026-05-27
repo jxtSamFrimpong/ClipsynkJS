@@ -1,13 +1,13 @@
 import { Entity } from "typeorm";
-import { Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index, BeforeInsert } from 'typeorm';
+import { Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Index, BeforeInsert, UpdateDateColumn } from 'typeorm';
 import { User } from "../../users/entities/user/user";
 import { Exclude, Expose } from 'class-transformer';
 import * as crypto from 'crypto';
 import { IsOptional, IsString } from "class-validator";
 
 export enum ipType {
-    IPv4 = 'IPv4',
-    IPv6 = 'IPv6'
+  IPv4 = 'IPv4',
+  IPv6 = 'IPv6'
 }
 
 @Entity('devices')
@@ -45,6 +45,12 @@ export class Device {
   @Column({ default: true })
   isActive: boolean;
 
+  // TODO: @UpdateDateColumn({
+  //   type: 'timestamp',
+  //   precision: 6,
+  //   default: () => 'CURRENT_TIMESTAMP(6)',
+  //   onUpdate: 'CURRENT_TIMESTAMP(6)'
+  // })
   @Column({ type: 'timestamp', nullable: true })
   lastSeen: Date;
 
@@ -60,6 +66,7 @@ export class Device {
       this.apiKey = `clipsynk_${crypto.randomBytes(32).toString('hex')}`;
     }
   }
+
 
   updateLastSeen() {
     this.lastSeen = new Date();
