@@ -1,0 +1,88 @@
+{
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  },
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_pre_compact.sh"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_task_completed.sh"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "principal-architect|backend-system-engineer|architect-wizard",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_subagent_stop.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolBatch": [
+      {
+        "matcher": "Edit|Write|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_post_tool_batch.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_post_tool_use_failure.sh"
+          },
+          {
+            "type": "agent",
+            "prompt": "You are the principal-architect. A tool command just failed.\n\nYOUR ROLE IS DIAGNOSIS ONLY — you must NOT implement any fix.\n\nFollow this exact sequence:\n\n1. DIAGNOSE: Read the error. Follow the Log Analysis Protocol (grep keywords first, grep -C for context, expand only if needed after 5-7 iterations). Identify the EXACT failure mechanism — not just what crashed, but why (wrong type, missing file, stale cache, protocol violation, OID resolution issue, etc.).\n\n2. CHECK TRACKER: Look in docs/active/ for the active task tracker. Log the failure summary and root cause under a 'Challenges' section. Do not paste full logs — one-line summary of what failed and why.\n\n3. PROPOSE FIX: Present the fix to the user using the Code Change Approval Protocol:\n   - Reason: why this change is needed\n   - What it solves: concrete impact\n   - If NOT implemented: what stays broken\n   - If implemented: what improves and any risks\n   - Proposed change: exact diff or description\n\n4. STOP. Do not implement the fix. Do not invoke the engineer.\n   After the user approves your diagnosis, the engineer (backend-system-engineer or architect-wizard) will implement it.\n   Your job ends when the user has a clear diagnosis and approved fix to hand over."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_post_tool_use.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Dev/Backend/JS/ClipsynkJS/.claude/hooks/on_session_end.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
