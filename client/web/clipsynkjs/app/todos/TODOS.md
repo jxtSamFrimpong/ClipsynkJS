@@ -58,7 +58,7 @@ surface area.
 
 ### Sprint 1.1: Fix read path correctness
 
-Status: `in progress`
+Status: `done`
 
 Files:
 
@@ -68,26 +68,26 @@ Files:
 
 Tasks left:
 
-- Fix backend pagination skip from `skip: (page - 1)` to
+- [x] Fix backend pagination skip from `skip: (page - 1)` to
   `skip: (page - 1) * limit`.
-- Return a stable object from the service instead of a raw tuple so the controller
+- [x] Return a stable object from the service instead of a raw tuple so the controller
   does not have to unpack indexes.
-- Align frontend loader output with `ClipsList` consumption.
+- [x] Align frontend loader output with `ClipsList` consumption.
   Current mismatch:
   loader returns `clipboardData: { total, page, limit }`, while `ClipsList`
   expects `total`, `page`, and `limit` at top level.
-- Remove stale placeholder comments in `ClipsList.tsx` once the list is fully
+- [x] Remove stale placeholder comments in `ClipsList.tsx` once the list is fully
   real-data backed.
 
 Definition of done:
 
-- Page 1, page 2, and next-page navigation return the correct records.
-- `Pagination.tsx` renders from real totals.
-- No stale mock-data comments remain in the live clipboard list.
+- [x] Page 1, page 2, and next-page navigation return the correct records.
+- [x] `Pagination.tsx` renders from real totals.
+- [x] No stale mock-data comments remain in the live clipboard list.
 
 ### Sprint 1.2: Finish clipboard paste mutation
 
-Status: `in progress`
+Status: `done`
 
 Files:
 
@@ -97,23 +97,23 @@ Files:
 
 Tasks left:
 
-- Export a route `action` from `dashboards.tsx` for clipboard creation.
-- Decide whether to revive `addToClipboard.ts` or inline the action logic in the
+- [x] Export a route `action` from `dashboards.tsx` for clipboard creation.
+- [x] Decide whether to revive `addToClipboard.ts` or inline the action logic in the
   route. The helper is currently commented out and still references an outdated
   `/clipboard/add` path.
-- From `PasteZone.tsx`, submit text payloads through `useFetcher`.
-- Build a valid `CreateClipboardDto` payload:
+- [x] From `PasteZone.tsx`, submit text payloads through `useFetcher`.
+- [x] Build a valid `CreateClipboardDto` payload:
   `generatedAt`, `deviceFingerprint`, `clientTimestamp`, `mimeType`, `content`,
   `contentHash`, `contentSize`.
-- Add a frontend hash helper for text content, or move hash generation server-side.
-- Let successful writes trigger a revalidation so the newly pasted item appears at
+- [x] Add a frontend hash helper for text content, or move hash generation server-side.
+- [x] Let successful writes trigger a revalidation so the newly pasted item appears at
   the top of the dashboard.
 
 Definition of done:
 
-- `Ctrl+V` or `Cmd+V` on the paste zone creates a clipboard record.
-- The dashboard list refreshes without manual reload.
-- Validation errors are surfaced in the UI or console with actionable messages.
+- [x] `Ctrl+V` or `Cmd+V` on the paste zone creates a clipboard record.
+- [x] The dashboard list refreshes without manual reload.
+- [x] Validation errors are surfaced in the UI or console with actionable messages.
 
 ### Sprint 1.3: Finish clipboard UX polish
 
