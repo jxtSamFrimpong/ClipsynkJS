@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useFetcher } from "react-router";
 import { buildFingerprint } from "~/utils/device";
 
@@ -12,6 +12,9 @@ import { buildFingerprint } from "~/utils/device";
 export default function PasteZone() {
     const zoneRef = useRef<HTMLDivElement>(null);
     const fetcher = useFetcher();
+    // Local state owns clipboard read errors (permission denied, API failure).
+    // These are distinct from backend errors that live in fetcher.data.
+    const [clipboardError, setClipboardError] = useState<string | null>(null);
 
     useEffect(() => {
         // Auto-focus the zone so it's ready for Ctrl+V
@@ -23,6 +26,8 @@ export default function PasteZone() {
         if ((e.ctrlKey || e.metaKey) && e.key === "v") {
             e.preventDefault();
             console.log("[PasteZone] Paste shortcut triggered");
+            // Clear any stale clipboard error before each new attempt
+            setClipboardError(null);
 
             const deviceFingerprint = buildFingerprint();
             try {
@@ -39,25 +44,54 @@ export default function PasteZone() {
                             console.log("Image found:", url);
                         } else if (type === "text/plain") {
                             const text = await blob.text();
-                            console.log("Text found:", text);
-                            // TODO: Send text to backend via action
+                            console.log("[PasteZone] Text found:", text);
+                            // Guard: skip empty or whitespace-only pastes
+                            if (!text.trim()) return;
+
+                            const payload = {
+                                generatedAt: new Date().toISOString(),
+                                clientTimestamp: Date.now(),
+                                deviceFingerprint,
+                                mimeType: "text/plain",
+                                content: text,
+                                contentSize: new Blob([text]).size,
+                            };
+
+                            console.log("[PasteZone] Submitting payload:", payload);
+                            fetcher.submit(
+                                { data: JSON.stringify(payload) },
+                                { method: "POST", action: "/?index" }
+                            );
                         } else {
                             console.log("Unknown type:", type);
                         }
                     }
                 }
             } catch (err) {
-                console.error("Failed to read clipboard: ", err);
+                // Distinguish permission denial from other clipboard read failures.
+                // NotAllowedError = user blocked clipboard access in browser settings.
+                if (err instanceof DOMException && err.name === "NotAllowedError") {
+                    setClipboardError(
+                        "Clipboard permission denied. Please allow clipboard access in your browser settings."
+                    );
+                } else {
+                    setClipboardError("Could not read clipboard. Please try again.");
+                }
+                console.error("[PasteZone] Failed to read clipboard:", err);
             }
         }
     };
+
+    // Derived UI state — no local copies, single source of truth from fetcher
+    const isSubmitting = fetcher.state !== "idle";
+    const actionData = fetcher.data as { success?: boolean; error?: string } | undefined;
 
     return (
         <div
             ref={zoneRef}
             tabIndex={0}
             onKeyDown={handlePaste}
-            className="flex flex-col items-center justify-center gap-2.5 w-full rounded-[10px] p-8 outline-none transition-all hover:bg-opacity-80"
+            className={`flex flex-col items-center justify-center gap-2.5 w-full rounded-[10px] p-8 outline-none transition-all hover:bg-opacity-80${isSubmitting ? " opacity-50 pointer-events-none" : ""}`}
             style={{
                 backgroundColor: "#141414",
                 border: "1px solid #3a3a3a",
@@ -190,6 +224,21 @@ export default function PasteZone() {
             >
                 files copied on your OS will include name · size · type · last modified metadata
             </div>
+
+            {/* Status banner — priority: local clipboard error > backend error > backend success */}
+            {clipboardError ? (
+                <div className="text-center font-mono" style={{ color: "#F59E0B", fontSize: 11 }}>
+                    {clipboardError}
+                </div>
+            ) : actionData?.error ? (
+                <div className="text-center font-mono" style={{ color: "#EF4444", fontSize: 11 }}>
+                    {actionData.error}
+                </div>
+            ) : actionData?.success ? (
+                <div className="text-center font-mono" style={{ color: "#10B981", fontSize: 11 }}>
+                    ✓ saved
+                </div>
+            ) : null}
         </div>
     );
 }

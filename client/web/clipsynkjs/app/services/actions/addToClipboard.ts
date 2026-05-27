@@ -1,3 +1,30 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  OBSOLETE — DO NOT USE
+//
+//  Purpose (original):
+//    Standalone action helper for creating clipboard events. It was designed to
+//    be called from a React Router action or directly from a component to POST
+//    clipboard data to the backend.
+//
+//  Why it is obsolete:
+//    1. It targets a removed endpoint (`/clipboard/add`). The backend now
+//       exposes `POST /clipboard` via ClipboardController.
+//    2. It does not forward the session cookie, so JWT auth would fail.
+//    3. Its payload shape is incomplete — only `content` and `deviceFingerprint`
+//       are sent, but the backend DTO now requires `generatedAt`,
+//       `clientTimestamp`, `mimeType`, and `contentSize` as well.
+//    4. All of this functionality has been replaced by the route action exported
+//       from `app/routes/dashboards.tsx`, which:
+//         - Correctly forwards the cookie header for JWT auth.
+//         - Sends the full CreateClipboardDto-compatible payload.
+//         - Returns a discriminated { success } | { error } shape consumed
+//           by PasteZone via useFetcher.
+//         - Triggers loader revalidation on success automatically.
+//
+//  This file is kept for historical reference. It is entirely commented out
+//  and has no imports anywhere in the codebase.
+// ─────────────────────────────────────────────────────────────────────────────
+//
 // import type { ActionFunctionArgs } from "react-router";
 
 // const API_BASE = process.env.API_BASE_URL;
